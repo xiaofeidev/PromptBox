@@ -2,13 +2,13 @@
   "manifest_version": 3,
   "name": "PromptBox",
   "version": "1.0",
-  "description": "一个简单的 Prompt 文本编辑和管理工具",
+  "description": "一个专门用于编辑和管理 AI Prompt 的工具。提供独立的编辑窗口，让你可以在避免误触发 AI 对话的情况下(比如手滑按下了回车键)，安全地编写、修改和组织你的 Prompt。支持自动保存、历史记录管理、主题切换等功能，帮助你更高效地准备和完善与 AI 的对话内容。",
   "permissions": [
     "storage",
     "sidePanel"
   ],
   "action": {
-    "default_title": "PromptBox"
+    "default_title": "PromptBox - AI Prompt 编辑器"
   },
   "background": {
     "service_worker": "background.js"

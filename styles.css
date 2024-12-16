@@ -136,7 +136,7 @@ body {
     justify-content: space-between;
     align-items: center;
     height: var(--toolbar-height);
-    padding: 0 12px;
+    padding: 0 8px;
     background-color: var(--background-color);
     border-bottom: 1px solid var(--border-color);
 }
@@ -302,7 +302,7 @@ body {
     justify-content: space-between;
     align-items: center;
     height: var(--toolbar-height);
-    padding: 0 12px;
+    padding: 0 8px;
     background-color: var(--background-color);
     border-bottom: 1px solid var(--border-color);
 }
