@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PromptBox</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="toolbar">
+            <div class="left-buttons">
+                <button id="wrapButton" class="tool-button active" title="自动换行">
+                    <img src="icons/wrap-text.svg" class="icon" alt="自动换行">
+                </button>
+                <button id="themeButton" class="tool-button" title="切换主题">
+                    <img src="icons/palette.svg" class="icon" alt="切换主题">
+                </button>
+                <button id="newButton" class="tool-button" title="新建">
+                    <img src="icons/new.svg" class="icon" alt="新建">
+                </button>
+                <button id="historyButton" class="tool-button" title="历史记录">
+                    <img src="icons/history.svg" class="icon" alt="历史记录">
+                </button>
+                <button id="copyButton" class="tool-button" title="复制">
+                    <img src="icons/copy.svg" class="icon" alt="复制">
+                </button>
+            </div>
+            <button id="settingsButton" class="tool-button" title="设置">
+                <img src="icons/settings.svg" class="icon" alt="设置">
+            </button>
+        </div>
+        
+        <textarea id="promptInput" class="wrap-text" placeholder="在此输入你的 prompt..."></textarea>
+
+        <div id="historyPanel" class="history-panel hidden">
+            <div class="history-header">
+                <div class="header-left">
+                    <h2>历史记录</h2>
+                    <button id="clearHistory" class="tool-button" title="清空历史记录">
+                        <img src="icons/delete.svg" class="icon" alt="清空历史记录">
+                    </button>
+                </div>
+                <button id="closeHistory" class="tool-button" title="关闭">
+                    <img src="icons/close.svg" class="icon" alt="关闭">
+                </button>
+            </div>
+            <div id="historyList" class="history-list"></div>
+        </div>
+
+        <div id="settingsPanel" class="settings-panel hidden">
+            <div class="settings-header">
+                <h2>设置</h2>
+                <button id="closeSettings" class="tool-button" title="关闭">
+                    <img src="icons/close.svg" class="icon" alt="关闭">
+                </button>
+            </div>
+            <div class="settings-content">
+                <div class="settings-item">
+                    <label for="fontSize">字体大小</label>
+                    <div class="font-size-control">
+                        <button class="font-size-btn" id="decreaseFontSize">-</button>
+                        <span id="fontSizeDisplay">15px</span>
+                        <button class="font-size-btn" id="increaseFontSize">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="notification" class="notification hidden">
+            <span id="notificationText"></span>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html> 
