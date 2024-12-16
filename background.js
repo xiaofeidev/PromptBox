@@ -1,10 +1,19 @@
-// 监听插件图标点击事件
-chrome.action.onClicked.addListener(async (tab) => {
-  // 打开侧边栏
-  await chrome.sidePanel.open({ windowId: tab.windowId });
-  // 设置侧边栏
-  await chrome.sidePanel.setOptions({
-    enabled: true,
-    path: 'popup.html'
-  });
+// 初始化侧边栏设置
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+
+// 设置侧边栏页面
+chrome.sidePanel.setOptions({
+    path: 'popup.html',
+    enabled: true
+});
+
+// 监听侧边栏状态变化
+chrome.sidePanel.onStatusChanged.addListener(async (status) => {
+    if (status === 'closed') {
+        // 当侧边栏关闭时，确保下次可以正常打开
+        await chrome.sidePanel.setOptions({
+            path: 'popup.html',
+            enabled: true
+        });
+    }
 }); 
