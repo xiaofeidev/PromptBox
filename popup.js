@@ -1,3 +1,5 @@
+import i18n from './i18n.js';
+
 class PromptBox {
     constructor() {
         this.currentPrompt = '';
@@ -5,13 +7,28 @@ class PromptBox {
         this.preferences = {
             wordWrap: true,
             theme: 'system',
-            fontSize: 15  // 默认字体大小
+            fontSize: 15
         };
-        this.minFontSize = 12;  // 最小字体大小
-        this.maxFontSize = 24;  // 最大字体大小
+        this.minFontSize = 12;
+        this.maxFontSize = 24;
         this.initElements();
         this.initEventListeners();
         this.loadData();
+        this.initI18n();
+    }
+
+    initI18n() {
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            i18n.updateElement(element, element.getAttribute('data-i18n'));
+        });
+
+        document.querySelectorAll('[data-i18n-title]').forEach(element => {
+            i18n.updateTitle(element, element.getAttribute('data-i18n-title'));
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+            i18n.updateElement(element, element.getAttribute('data-i18n-placeholder'));
+        });
     }
 
     initElements() {
@@ -50,7 +67,8 @@ class PromptBox {
         this.clearHistory.addEventListener('click', () => this.confirmClearHistory());
     }
 
-    showNotification(message, duration = 2000) {
+    showNotification(key, params = {}) {
+        const message = i18n.t(key, params);
         this.notificationText.textContent = message;
         this.notification.classList.remove('hidden');
         setTimeout(() => this.notification.classList.add('show'), 10);
@@ -58,7 +76,7 @@ class PromptBox {
         setTimeout(() => {
             this.notification.classList.remove('show');
             setTimeout(() => this.notification.classList.add('hidden'), 300);
-        }, duration);
+        }, 2000);
     }
 
     async loadData() {
@@ -66,7 +84,6 @@ class PromptBox {
         this.currentPrompt = result.currentPrompt || '';
         this.prompts = result.prompts || [];
         
-        // 确保首选项中包含所有默认值
         this.preferences = {
             wordWrap: true,
             theme: 'system',
@@ -75,7 +92,6 @@ class PromptBox {
             wordWrap: result.preferences?.wordWrap ?? true
         };
         
-        // 应用保存的首选项
         if (!this.preferences.wordWrap) {
             this.toggleWrap(false);
         }
@@ -150,65 +166,80 @@ class PromptBox {
         this.updateHistoryList();
     }
 
-    // 判断是否为汉字
     isChineseChar(char) {
         return /[\u4e00-\u9fa5]/.test(char);
     }
 
-    // 获取文本前缀
     getContentPrefix(content) {
-        let prefix = '';
-        let chineseCount = 0;
-        let wordCount = 0;
+        let units = [];
         let currentWord = '';
-        let hasPrefix = false;
+        let consecutiveUnits = 0;
+        let bestPrefix = null;
+        let lastWasSpace = false;
 
-        for (let i = 0; i < content.length; i++) {
+        const processCurrentWord = () => {
+            if (currentWord) {
+                if (lastWasSpace && units.length > 0) {
+                    units.push({ text: ' ', units: 0 });
+                }
+                units.push({ text: currentWord, units: 2 });
+                consecutiveUnits += 2;
+                currentWord = '';
+            }
+        };
+
+        for (let i = 0; i < content.length && !bestPrefix; i++) {
             const char = content[i];
             
             if (this.isChineseChar(char)) {
-                // 处理汉字
-                if (currentWord) {
-                    wordCount++;
-                    currentWord = '';
+                processCurrentWord();
+                if (lastWasSpace && units.length > 0) {
+                    units.push({ text: ' ', units: 0 });
                 }
-                chineseCount++;
-                prefix += char;
-                
-                if (chineseCount >= 10) {
-                    hasPrefix = true;
-                    break;
-                }
-            } else if (/[a-zA-Z]/.test(char)) {
-                // 处理英文字母
+                units.push({ text: char, units: 1 });
+                consecutiveUnits += 1;
+                lastWasSpace = false;
+            } else if (/\s/.test(char)) {
+                processCurrentWord();
+                lastWasSpace = true;
+            } else {
                 currentWord += char;
-            } else if (char === ' ' || char === '\n' || char === '\t') {
-                // 处理分隔符
-                if (currentWord) {
-                    wordCount++;
-                    prefix += (prefix ? ' ' : '') + currentWord;
-                    currentWord = '';
-                    
-                    if (wordCount >= 5) {
-                        hasPrefix = true;
+                lastWasSpace = false;
+            }
+
+            if (consecutiveUnits >= 10 && !bestPrefix) {
+                let prefix = '';
+                let currentUnits = 0;
+                
+                for (let unit of units) {
+                    prefix += unit.text;
+                    currentUnits += unit.units;
+                    if (currentUnits >= 10) {
+                        bestPrefix = prefix;
                         break;
                     }
                 }
             }
         }
 
-        // 处理最后一个单词
-        if (currentWord && wordCount < 5) {
-            wordCount++;
-            prefix += (prefix ? ' ' : '') + currentWord;
+        if (!bestPrefix && currentWord) {
+            processCurrentWord();
+            if (consecutiveUnits >= 10 && !bestPrefix) {
+                let prefix = '';
+                let currentUnits = 0;
+                
+                for (let unit of units) {
+                    prefix += unit.text;
+                    currentUnits += unit.units;
+                    if (currentUnits >= 10) {
+                        bestPrefix = prefix;
+                        break;
+                    }
+                }
+            }
         }
 
-        // 如果既没有达到 10 个汉字也没有达到 5 个单词，返回 null
-        if (!hasPrefix && chineseCount < 10 && wordCount < 5) {
-            return null;
-        }
-
-        return prefix.trim();
+        return bestPrefix;
     }
 
     toggleHistory() {
@@ -218,16 +249,15 @@ class PromptBox {
     async copyPrompt() {
         const text = this.promptInput.value.trim();
         if (!text) {
-            this.showNotification('无内容可复制');
+            this.showNotification('no_content');
             return;
         }
             
-        
         try {
             await navigator.clipboard.writeText(text);
-            this.showNotification('已复制到剪贴板');
+            this.showNotification('copied');
         } catch (err) {
-            this.showNotification('复制失败');
+            this.showNotification('copy_failed');
         }
     }
 
@@ -242,7 +272,6 @@ class PromptBox {
         const currentPromptData = this.prompts[0];
         currentPromptData.content = content;
 
-        // 如果文件名还没有包含内容前缀
         if (currentPromptData.fileName.indexOf('_') === -1) {
             const prefix = this.getContentPrefix(content);
             if (prefix) {
@@ -276,7 +305,6 @@ class PromptBox {
             nameSpan.textContent = prompt.fileName;
             nameSpan.style.cursor = 'text';
             
-            // 创建一个编辑按钮
             const editButton = document.createElement('button');
             editButton.className = 'tool-button edit-button';
             editButton.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
@@ -321,13 +349,13 @@ class PromptBox {
             const newName = input.value.trim();
             if (newName && newName !== prompt.fileName) {
                 if (!newName.endsWith('.txt')) {
-                    this.showNotification('文件名必须以 .txt 结尾');
+                    this.showNotification('filename_txt_required');
                     input.focus();
                     return;
                 }
                 
                 if (!/^[^\\/:*?"<>|]+$/.test(newName)) {
-                    this.showNotification('文件名包含非法字符');
+                    this.showNotification('filename_invalid_chars');
                     input.focus();
                     return;
                 }
@@ -363,10 +391,10 @@ class PromptBox {
         const confirmDiv = document.createElement('div');
         confirmDiv.className = 'confirm-delete';
         confirmDiv.innerHTML = `
-            <div class="confirm-message">确定要删除 "${prompt.fileName}" 吗？</div>
+            <div class="confirm-message">${i18n.t('confirm_delete', { name: prompt.fileName })}</div>
             <div class="confirm-buttons">
-                <button class="confirm-button confirm-yes">删除</button>
-                <button class="confirm-button confirm-no">取消</button>
+                <button class="confirm-button confirm-yes">${i18n.t('confirm_yes')}</button>
+                <button class="confirm-button confirm-no">${i18n.t('confirm_no')}</button>
             </div>
         `;
         
@@ -415,10 +443,10 @@ class PromptBox {
     changeFontSize(delta) {
         const newSize = this.preferences.fontSize + delta;
         if (newSize < this.minFontSize) {
-            this.showNotification(`字体大小不能小于 ${this.minFontSize}px`);
+            this.showNotification('min_font_size', { size: this.minFontSize });
             this.preferences.fontSize = this.minFontSize;
         } else if (newSize > this.maxFontSize) {
-            this.showNotification(`字体大小不能大于 ${this.maxFontSize}px`);
+            this.showNotification('max_font_size', { size: this.maxFontSize });
             this.preferences.fontSize = this.maxFontSize;
         } else {
             this.preferences.fontSize = newSize;
@@ -437,22 +465,21 @@ class PromptBox {
         const confirmDiv = document.createElement('div');
         confirmDiv.className = 'confirm-delete';
         confirmDiv.innerHTML = `
-            <div class="confirm-message">确定要清空所有历史记录吗？此操作不可恢复。</div>
+            <div class="confirm-message">${i18n.t('confirm_clear_history')}</div>
             <div class="confirm-buttons">
-                <button class="confirm-button confirm-yes">清空</button>
-                <button class="confirm-button confirm-no">取消</button>
+                <button class="confirm-button confirm-yes">${i18n.t('confirm_clear_yes')}</button>
+                <button class="confirm-button confirm-no">${i18n.t('confirm_no')}</button>
             </div>
         `;
         
         const handleConfirm = async (confirmed) => {
             if (confirmed) {
-                // 清空所有历史记录
                 this.prompts = [];
                 this.currentPrompt = '';
                 this.promptInput.value = '';
                 await this.savePrompts();
                 this.updateHistoryList();
-                this.showNotification('已清空所有历史记录');
+                this.showNotification('history_cleared');
             }
             confirmDiv.remove();
         };
