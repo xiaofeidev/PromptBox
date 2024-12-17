@@ -12,7 +12,7 @@ const translations = {
         'close': '关闭',
 
         // 输入框
-        'input_placeholder': '在此输入你的 prompt...',
+        'input_placeholder': '在此输入您的 prompt...',
 
         // 历史记录面板
         'history_title': '历史记录',
@@ -32,7 +32,7 @@ const translations = {
         'history_cleared': '已清空所有历史记录',
 
         // 确认对话框
-        'confirm_delete': '确定要删除 "{name}" 吗���',
+        'confirm_delete': '确定要删除 "{name}" 吗？',
         'confirm_clear_history': '确定要清空所有历史记录吗？此操作不可恢复。',
         'confirm_yes': '删除',
         'confirm_clear_yes': '清空',
@@ -107,7 +107,7 @@ class I18n {
     updateElement(element, key, params = {}) {
         if (element) {
             if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                if (element.getAttribute('placeholder')) {
+                if (element.hasAttribute('data-i18n-placeholder')) {
                     element.setAttribute('placeholder', this.t(key, params));
                 }
             } else {

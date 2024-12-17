@@ -4,7 +4,7 @@
         "description": "The name of the extension"
     },
     "appDesc": {
-        "message": "A dedicated tool for editing and managing AI prompts. Provides a separate editing window that lets you safely write, modify, and organize your prompts without accidentally triggering AI conversations (like accidentally pressing enter). Features auto-save, history management, theme switching, and more to help you more efficiently prepare and refine your AI conversation content.",
+        "message": "A dedicated tool for editing and managing AI prompts. Helps you avoid accidentally triggering conversations by pressing enter.",
         "description": "The description of the extension"
     }
 } 
