@@ -1,54 +1,59 @@
-# PromptBox Chrome 插件
+# PromptBox
 
-PromptBox 是一个简单而强大的 Chrome 浏览器插件，用于管理和编辑 prompt 文本。它提供了一个方便的侧边栏界面，让你可以随时编写、保存和管理你的 prompt。
+[English](#english) | [中文](#chinese)
 
-## 主要功能
+## English
 
-1. **文本编辑**
-   - 大型文本输入框，支持多行编辑
-   - 自动保存功能
-   - 可切换文本自动换行/不换行显示
+PromptBox is a Chrome extension specifically designed for editing and managing AI prompts.
 
-2. **主题切换**
-   - 支持系统默认主题
-   - 豆沙绿色主题
-   - 深色主题
+Key Features:
+• Dedicated editing window to avoid accidental AI interactions
+• Prevents unintended submissions (like accidental Enter key presses)
+• Auto-saves all edits
+• Complete history management
+• Light/Dark theme support
+• Adjustable font size
+• Word wrap control
 
-3. **Prompt 管理**
-   - 新建 Prompt
-   - 查看历史记录
-   - 重命名 Prompt 文件
-   - 删除 Prompt
-   - 快速复制当前 Prompt
+Use Cases:
+• When crafting lengthy prompts
+• When you need to safely edit and modify prompts
+• When managing multiple prompts
+• When frequently using various AI chat tools
+
+All data is stored locally to protect your privacy.
+
+## Installation
+1. Download the project code
+2. Open Chrome browser and go to extensions page (chrome://extensions/)
+3. Enable "Developer mode"
+4. Click "Load unpacked"
+5. Select the project folder
+
+## Chinese
+
+PromptBox 是一个专门设计用于编辑和管理 AI Prompt 的 Chrome 插件。
+
+主要特点：
+• 独立编辑窗口，避免误触发 AI 对话
+• 防止意外提交（如误按回车键）
+• 自动保存所有编辑内容
+• 完整的历史记录管理
+• 支持明暗主题切换
+• 可调整字体大小
+• 自动换行控制
+
+使用场景：
+• 需要精心编写长篇 Prompt
+• 想要安全地编辑和修改 Prompt
+• 需要保存和管理多个 Prompt
+• 频繁使用各种 AI 对话工具
+
+所有数据均存储在本地，保护你的隐私。
 
 ## 安装方法
-
 1. 下载本项目代码
 2. 打开 Chrome 浏览器，进入扩展程序页面（chrome://extensions/）
 3. 开启"开发者模式"
 4. 点击"加载已解压的扩展程序"
 5. 选择本项目所在文件夹
-
-## 使用方法
-
-1. 点击 Chrome 工具栏中的 PromptBox 图标，插件会在浏览器右侧打开
-2. 在文本框中输入你的 prompt 内容
-3. 使用顶部工具栏的按钮进行各种操作：
-   - ⇌：切换文本换行模式
-   - 🎨：切换主题颜色
-   - +：新建 Prompt
-   - 📋：查看历史记录
-   - 📄：复制当前 Prompt
-   - ✕：关闭插件窗口
-
-## 文件命名规则
-
-- 新建的 Prompt 文件默认使用创建时间命名
-- 当输入内容超过 5 个字符时，文件名会自动添加内容前缀
-- 可以在历史记录中手动重命名文件（仅支持 .txt 格式）
-
-## 注意事项
-
-- 所有的 Prompt 都会自动保存
-- 文件名不能包含特殊字符（\ / : * ? " < > |）
-- 重命名文件时必须保留 .txt 后缀 
